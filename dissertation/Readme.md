@@ -8,4 +8,4 @@ Before installing please ensure the following python packages are installed:
 - Tensorflow v1.15 - `pip install tensorflow==1.15` or `tensorflow-gpu==1.15`[https://www.tensorflow.org/](https://www.tensorflow.org/)
 - Pandas - `pip install pandas` [https://pandas.pydata.org/](https://pandas.pydata.org/)
 
-Following that copy the files from the repo into the main BluSky directory.
+Following that copy the files from the repo into the main BlueSky directory.

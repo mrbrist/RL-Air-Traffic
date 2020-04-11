@@ -5,11 +5,15 @@ Undergraduate dissertation, using RL agents to keep aircraft vertical separation
 ## Important Notice About Systems Used
 This project uses two systems as its foundation. 
 For the simulation BlueSky is used. Bluesky is an open source air traffic simulation tool and is built using python: 
+
 *Citation info:* J. M. Hoekstra and J. Ellerbroek, "[BlueSky ATC Simulator Project: an Open Data and Open Source Approach](https://www.researchgate.net/publication/304490055_BlueSky_ATC_Simulator_Project_an_Open_Data_and_Open_Source_Approach)", Proceedings of the seventh International Conference for Research on Air Transport (ICRAT), 2016.
+
 *Github Link:*[https://github.com/TUDelft-CNS-ATM/bluesky](https://github.com/TUDelft-CNS-ATM/bluesky) 
 
 The foundation for the RL and most of this project lies with Marc Brittian, his work has been crucial and many of the concepts, methods and classes are based on or use his origional work:
+
 *Related paper:*[https://arxiv.org/abs/1905.01303](https://arxiv.org/abs/1905.01303)
+
 *Github Link:*[https://github.com/marcbrittain/bluesky](https://github.com/marcbrittain/bluesky)
 
 ## How To Use This Repo
