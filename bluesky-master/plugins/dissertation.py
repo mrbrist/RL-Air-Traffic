@@ -23,7 +23,7 @@ from bluesky.tools.aero import ft
 
 from Diss_Agent.atc_agent import Mult_Agent
 
-EPISODES = 10000
+EPISODES = 2000
 
 
 ### Initialization function of your plugin. Do not change the name of this
@@ -55,13 +55,16 @@ def init_plugin():
     global best_reward
 
     try:
-        positions = np.load('routes/default.npy')
+        # positions = np.load('routes/default.npy')
+        positions = np.load('routes/Sim 2.npy')
     except:
-        positions = np.array([[46.3, -20.7, 0, 47, -20.7], [47, -20.7, 180, 46.3, -20.7]])
-        np.save("routes/default.npy", positions)
-        positions = np.load('routes/default.npy')
+        positions = np.array([[46.3, -20.7, 0, 47, -20.7], [47, -20.7, 180, 46.3, -20.7],[46, -20.7, 0, 47, -20.7]])
+        # np.save("routes/default.npy", positions)
+        # positions = np.load('routes/default.npy')
+        np.save("routes/Sim 2.npy", positions)
+        positions = np.load('routes/Sim 2.npy')
     
-    max_ac = 200
+    max_ac = 8
     active_ac = 0
     total_ac = 0
     # 5  states: lat, lon, alt, route, vs
@@ -338,19 +341,19 @@ def reset():
 
     t_success = np.array(total_sucess)
     t_coll = np.array(total_collision)
-    np.save('200AC NoA goal.npy',t_success)
-    np.save('200AC NoA collision.npy',t_coll)
+    np.save('Sim 2 success.npy',t_success)
+    np.save('Sim 2 collision.npy',t_coll)
 
 
 
     if EPISODES > 150:
         df = pd.DataFrame(t_success)
         if float(df.rolling(150,150).mean().max()) >= best_reward:
-            agent.save(True)
+            agent.save(True, _type='Sim 2')
             best_reward = float(df.rolling(150,150).mean().max())
 
 
-    agent.save()
+    agent.save(_type='Sim 2')
 
 
     print("Episode: {} | Reward: {} | Best Reward: {}".format(episode_counter,goals_made,best_reward))
@@ -372,7 +375,7 @@ def reset():
         plt.ylabel('# Aircraft')
         plt.xlim(0, EPISODES-1)
         plt.ylim(0, max_ac)
-        plt.title('100 Aircraft Test - With No Agent')
+        plt.title('Sim 2 Training')
         plt.legend()
         
         plt.show()
