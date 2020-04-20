@@ -80,7 +80,7 @@ class Mult_Agent:
         self.statesize = state_size
         self.no_actions = no_actions
         self.action_size = action_size
-        self.alts = [26000, 28000, 30000]
+        self.alts = [24000, 26000, 28000, 30000, 32000]
         self.num_intruders = num_intruders
         self.value_size = 1
         self.routes = routes
@@ -94,8 +94,9 @@ class Mult_Agent:
 
         self.model = self.__Build__Model()
         
-        if not (self.load('best_model_default.h5')):
-            self.load('latest_model_default.h5')
+        if not (self.load('best_model_Sim 2-3.h5')):
+            #self.load('latest_model_model2.h5')
+            pass
 
     # Build the ml model
     def __Build__Model(self):

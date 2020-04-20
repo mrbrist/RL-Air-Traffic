@@ -1,2 +1,5 @@
 
 *.DESKTOP-97JSDFU
+bluesky-master/logs/fit/ 20200415-195249/events.out.tfevents.1586976826.DESKTOP-97JSDFU.profile-empty
+*.profile-empty
+*.trace

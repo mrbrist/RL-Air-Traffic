@@ -69,7 +69,7 @@ def init_plugin():
     total_ac = 0
     # 5  states: lat, lon, alt, route, vs
     no_states = 5
-    number_of_actions = 3
+    number_of_actions = 5
     intruders = 2
     agent = Mult_Agent(no_states, number_of_actions,number_of_actions, intruders, positions)
     times = [20, 25, 30]
@@ -185,10 +185,10 @@ def update():
 
             try:
                 agent.store(previous_observation[call_sig], previous_action[call_sig], [np.zeros(previous_observation[call_sig][0].shape), (previous_observation[call_sig][1].shape)], traf, call_sig, ac_routes, T_type)
+                del previous_observation[call_sig]
             except Exception as e:
                 print(f'ERROR: {e}')
-            
-            del previous_observation[call_sig]
+
 
     if active_ac == 0 and max_ac == total_ac:
         reset()
@@ -221,8 +221,8 @@ def update():
 
         policy, values = agent.act(normal_state, context)
 
-        # if (episode_counter + 1) % 20 == 0:
-        #     print(policy)
+        if (episode_counter + 1) % 20 == 0:
+            print(policy)
 
         for j in range(len(non_T_ids)):
             id_ = non_T_ids[j]
@@ -341,22 +341,21 @@ def reset():
 
     t_success = np.array(total_sucess)
     t_coll = np.array(total_collision)
-    np.save('Sim 2 success.npy',t_success)
-    np.save('Sim 2 collision.npy',t_coll)
-
+    np.save('Sim 2 success2-4.npy',t_success)
+    np.save('Sim 2 collision2-4.npy',t_coll)
 
 
     if EPISODES > 150:
         df = pd.DataFrame(t_success)
         if float(df.rolling(150,150).mean().max()) >= best_reward:
-            agent.save(True, _type='Sim 2')
+            agent.save(True, _type='Sim 2-4')
             best_reward = float(df.rolling(150,150).mean().max())
 
 
-    agent.save(_type='Sim 2')
+    agent.save(_type='Sim 2-4')
 
 
-    print("Episode: {} | Reward: {} | Best Reward: {}".format(episode_counter,goals_made,best_reward))
+    print("Episode: {} | Reward: {} | Best Reward: {:.2f} | Mean Reward: {:.2f}".format(episode_counter,goals_made,best_reward, (np.mean(t_success))))
 
 
     episode_counter += 1
