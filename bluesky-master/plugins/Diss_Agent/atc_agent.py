@@ -32,7 +32,9 @@ def dist_goal(traf,_id):
 
     olat = traf.lat[_id]
     olon = traf.lon[_id]
-    ilat,ilon = traf.ap.route[_id].wplat[0],traf.ap.route[_id].wplon[0]
+    #ilat, ilon = traf.ap.route[_id].wplat[0], traf.ap.route[_id].wplon[0]
+    # Sim 3
+    ilat,ilon = traf.ap.route[_id].wplat[1],traf.ap.route[_id].wplon[1]
 
     dist = geo.latlondist(olat,olon,ilat,ilon)/geo.nm
     return dist
@@ -94,8 +96,9 @@ class Mult_Agent:
 
         self.model = self.__Build__Model()
         
-        if not (self.load('best_model_default.h5')):
-            self.load('latest_model_default.h5')
+        # Uncomment these lines to load model
+        if not (self.load('best_model_Sim_3 default.h5')):
+            self.load('latest_model_Sim_3 default.h5')
 
     # Build the ml model
     def __Build__Model(self):
@@ -259,14 +262,14 @@ class Mult_Agent:
         alt = alt / ft
         #print(f'{id_}, {terminal_type}, {alt}, {dist}')
         #print(terminal_type)
-        if terminal_type == 0:
-            if (dist > 5 and alt < 995) and (len(traf.id) > 1):
-                reward = 0 - 0.05 * (alt / 100)
-            elif dist > 5 and alt > 995:
-                reward = 0 + 0.05 * (alt / 100)
+        # if terminal_type == 0:
+        #     if (dist > 5 and alt < 995) and (len(traf.id) > 1):
+        #         reward = 0 - 0.05 * (alt / 100)
+        #     elif dist > 5 and alt > 995:
+        #         reward = 0 + 0.05 * (alt / 100)
             
-            if dist <= 3 and alt >= 1000:
-                reward = 0.5
+        #     if dist <= 3 and alt >= 1000:
+        #         reward = 0.5
 
         if terminal_type == 1:
             reward = -1
@@ -376,7 +379,8 @@ class Mult_Agent:
                 total_policy = np.append(total_policy,policy,axis=0)
 
 
-        total_A = (total_A - total_A.mean())/(total_A.std() + 1e-8)
+        total_A = (total_A - total_A.mean()) / (total_A.std() + 1e-8)
+        print(f'Training reward : {np.sum(total_reward)}')
         self.model.fit({'input_states':total_state,'context':total_context,'empty':np.zeros((total_length,HIDDEN_SIZE)),'A':total_A,'prev_predictions':total_policy}, {'policy_out':total_advantage,'value_out':total_reward}, shuffle=True,batch_size=total_state.shape[0],epochs=8, verbose=0, callbacks=[self.tensorboard_callback])
 
 

@@ -4,22 +4,22 @@ import numpy as np
 import os
 
 
-ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--path", default="routes/case_study_a_route", help="path to route file")
-args = vars(ap.parse_args())
+# ap = argparse.ArgumentParser()
+# ap.add_argument("-p", "--path", default="routes/default.npy", help="path to route file")
+# args = vars(ap.parse_args())
 
 
 latitude = {}
 longitude = {}
 
-route = np.load(args['path'])
+route = np.load('routes/default.npy')
 
 gmap = gmplot.GoogleMapPlotter(route[0, 0],
                                route[0, 1], 7)
 
 for i in range(len(route)):
-    latitude[i] = [route[i, 0], route[i, 2]]
-    longitude[i] = [route[i, 1], route[i, 3]]
+    latitude[i] = [route[i, 0], route[i, 3]]
+    longitude[i] = [route[i, 1], route[i, 4]]
 
     # scatter method of map object
     # scatter points on the google map

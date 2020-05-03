@@ -23,7 +23,7 @@ from bluesky.tools.aero import ft
 
 from Diss_Agent.atc_agent import Mult_Agent
 
-EPISODES = 10000
+EPISODES = 1
 
 
 ### Initialization function of your plugin. Do not change the name of this
@@ -53,15 +53,22 @@ def init_plugin():
     global start
     global intruders
     global best_reward
+    global mean
+    mean = []
 
     try:
-        positions = np.load('routes/default.npy')
+        positions = np.load('routes/sim3.npy')
     except:
-        positions = np.array([[46.3, -20.7, 0, 47, -20.7], [47, -20.7, 180, 46.3, -20.7]])
-        np.save("routes/default.npy", positions)
-        positions = np.load('routes/default.npy')
+        # Sim 1
+        #positions = np.array([[46.3, -20.7, 0, 47, -20.7], [47, -20.7, 180, 46.3, -20.7]])
+        # Sim 2
+        #positions = np.array([[46.3, -20.7, 0, 47, -20.7], [47, -20.7, 180, 46.3, -20.7], [46.65, -20.201, 270, 46.65, -21.2055]])
+        # Sim 3
+        positions = np.array([[47.3, -21.4, 128.029, 46.65,-17], [46, -21.4, 51.434, 46.65, -17], [46.65, -21.6, 90, 46.65, -17]])
+        np.save("routes/sim3.npy", positions)
+        positions = np.load('routes/sim3.npy')
     
-    max_ac = 200
+    max_ac = 500
     active_ac = 0
     total_ac = 0
     # 5  states: lat, lon, alt, route, vs
@@ -252,10 +259,18 @@ def update():
 
 
 def spawn_ac(_id, ac_details):
+    # Uncomment for Sim 3 
     lat, lon, hdg, glat, glon = ac_details
+    # Uncomment for Sim 1 and 2
+    # lat, lon, hdg, glat, glon = ac_details
+    #speed = 251
+    speed = np.random.randint(251,340)
     
-    stack.stack('CRE SWAN{}, A320, {}, {}, {}, 28000,251'.format(_id, lat, lon, hdg))
+    stack.stack('CRE SWAN{}, A320, {}, {}, {}, 28000,{}'.format(_id, lat, lon, hdg, speed))
 
+    # Sim 3 only
+    stack.stack('ADDWPT SWAN{} {}, {}'.format(_id, 46.65, -20.201))
+    # All Sims
     stack.stack('ADDWPT SWAN{} {}, {}'.format(_id,glat,glon))
 
 def dist_goal(_id):
@@ -305,11 +320,12 @@ def reset():
     global start
     global intruders
     global best_reward
+    global mean
 
-    if (episode_counter + 1) % 5 == 0:
-        print("\n\n---------- TRAINING ----------\n\n")
-        agent.train()
-        print("\n\n---------- COMPLETE ----------\n\n")
+    # if (episode_counter + 1) % 5 == 0:
+    #     print("\n\n---------- TRAINING ----------\n\n")
+    #     agent.train()
+    #     print("\n\n---------- COMPLETE ----------\n\n")
 
     end = time()
 
@@ -318,6 +334,9 @@ def reset():
 
     total_sucess.append(success_counter)
     total_collision.append(collision_counter)
+
+    mean_success = np.mean(total_sucess)
+    mean.append(mean_success)
 
 
     success_counter = 0
@@ -338,22 +357,24 @@ def reset():
 
     t_success = np.array(total_sucess)
     t_coll = np.array(total_collision)
-    np.save('200AC NoA goal.npy',t_success)
-    np.save('200AC NoA collision.npy',t_coll)
+    # np.save('results/sim3Suc.npy',t_success)
+    # np.save('results/sim3Col.npy', t_coll)
+    
+    final = np.array(list(zip(total_sucess, total_collision, mean)))
+
+    # np.savetxt('results/sim3.csv', final, delimiter=',', fmt='%.5f')
+
+    # if EPISODES > 150:
+    #     df = pd.DataFrame(t_success)
+    #     if float(df.rolling(150,150).mean().max()) >= best_reward:
+    #         agent.save(_type='Sim_3 default',highest=True)
+    #         best_reward = float(df.rolling(150,150).mean().max())
 
 
-
-    if EPISODES > 150:
-        df = pd.DataFrame(t_success)
-        if float(df.rolling(150,150).mean().max()) >= best_reward:
-            agent.save(True)
-            best_reward = float(df.rolling(150,150).mean().max())
+    # agent.save(_type='Sim_3 default')
 
 
-    agent.save()
-
-
-    print("Episode: {} | Reward: {} | Best Reward: {}".format(episode_counter,goals_made,best_reward))
+    print("Episode: {} | Reward: {} | Best Reward: {} | Mean Success: {}".format(episode_counter,goals_made,best_reward, mean_success))
 
 
     episode_counter += 1
@@ -361,18 +382,18 @@ def reset():
     if episode_counter == EPISODES:
         stack.stack('STOP')
         
-        collision_avg = np.average(total_collision)
-        success_avg = np.average(total_sucess)
+        collision_mean = np.mean(total_collision)
+        success_mean = np.mean(total_sucess)
 
         plt.plot(total_sucess, label='Successes', color='green')
-        plt.axhline(y=success_avg, color='green', linestyle='dotted', label='Avg Successes')
+        plt.axhline(y=success_mean, color='green', linestyle='dotted', label='Mean Successes')
         plt.plot(total_collision, label='Collisions', color='red')
-        plt.axhline(y=collision_avg, color='red', linestyle='dotted', label='Avg Collisions')
+        plt.axhline(y=collision_mean, color='red', linestyle='dotted', label='Mean Collisions')
         plt.xlabel('Episode')
         plt.ylabel('# Aircraft')
         plt.xlim(0, EPISODES-1)
         plt.ylim(0, max_ac)
-        plt.title('100 Aircraft Test - With No Agent')
+        plt.title('Sim 1')
         plt.legend()
         
         plt.show()
